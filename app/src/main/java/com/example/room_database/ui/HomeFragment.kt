@@ -1,16 +1,19 @@
 package com.example.room_database.ui
 
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.room_database.R
+import com.example.room_database.database.NoteDatabase
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.launch
 
-class HomeFragment : Fragment() {
+class HomeFragment : BaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -22,6 +25,16 @@ class HomeFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        recyclerview.setHasFixedSize(true)
+        recyclerview.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+
+        launch {
+            context?.let {
+                val notes = NoteDatabase(it).getNoteDao().getAllNotes()
+                recyclerview.adapter = NoteAdapter(notes)
+            }
+        }
 
         floating_add.setOnClickListener {
             val action = HomeFragmentDirections.actionAddNote()
